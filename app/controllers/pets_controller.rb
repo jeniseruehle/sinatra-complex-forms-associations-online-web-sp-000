@@ -18,19 +18,31 @@ class PetsController < ApplicationController
     redirect to "pets/#{@pet.id}"
   end
 
-  get '/pets/:id' do 
-    @pet = Pet.find(params[:id])
-    @owner = Owner.find(@pet.owner_id)
-    erb :'/pets/show'
-  end
-  
   get '/pets/:id/edit' do
     @pet = Pet.find(params[:id])
     erb :'/pets/edit'
   end 
 
-  patch '/pets/:id' do 
+  get '/pets/:id' do 
+    @pet = Pet.find(params[:id])
+    @owner = Owner.find(@pet.owner_id)
+    erb :'/pets/show'
+  end
 
+  patch '/pets/:id' do 
+    ####### bug fix
+    if !params[:owner].keys.include?("pet_ids")
+    params[:owner]["pet_ids"] = []
+    end
+    #######
+ 
+    @owner = Owner.find(params[:id])
+    @owner.update(params["owner"])
+    if !params["pet"]["name"].empty?
+      @owner.pets << Pet.create(name: params["pet"]["name"])
+    end
+    redirect "owners/#{@owner.id}"
+  end
     redirect to "pets/#{@pet.id}"
   end
 end
